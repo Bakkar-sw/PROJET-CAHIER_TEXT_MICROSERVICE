@@ -1,0 +1,196 @@
+# ============================================
+# .gitignore pour Cahier Texte Microservices
+# ============================================
+
+# ============================================
+# BACKEND (Maven + Spring Boot)
+# ============================================
+
+# Maven
+**/target/
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+**/pom.xml.next
+**/release.properties
+**/dependency-reduced-pom.xml
+**/.mvn/timing.properties
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Spring Boot
+**/BOOT-INF/
+**/META-INF/
+
+# Logs
+**/*.log
+**/logs/
+**/spring.log
+
+# ============================================
+# FRONTEND (Angular)
+# ============================================
+
+# Dependencies
+**/node_modules/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+
+# Angular
+**/.angular/
+**/dist/
+**/out-tsc/
+**/*.js.map
+
+# Build
+**/build/
+**/.cache/
+
+# ============================================
+# IDE (Eclipse, IntelliJ, VSCode)
+# ============================================
+
+# Eclipse
+**/.classpath
+**/.project
+**/.settings/
+**/.factorypath
+**/.springBeans
+**/bin/
+
+# IntelliJ IDEA
+**/.idea/
+**/*.iml
+**/*.iws
+**/*.ipr
+**/out/
+
+# VSCode
+**/.vscode/
+**/*.code-workspace
+
+# NetBeans
+**/nbproject/private/
+**/nbbuild/
+**/nbdist/
+**/.nb-gradle/
+
+# ============================================
+# OS (Mac, Windows, Linux)
+# ============================================
+
+# Mac
+**/.DS_Store
+**/.AppleDouble
+**/.LSOverride
+**/._*
+
+# Windows
+**/Thumbs.db
+**/ehthumbs.db
+**/Desktop.ini
+**/$RECYCLE.BIN/
+
+# Linux
+**/*~
+
+# ============================================
+# CONFIGURATION SENSIBLE
+# ============================================
+
+# Ne JAMAIS commit les mots de passe !
+**/application-prod.yml
+**/application-secret.yml
+**/*.env
+**/.env.local
+
+# Mais gardez les exemples
+!**/application-example.yml
+!**/.env.example
+
+# ============================================
+# FICHIERS TEMPORAIRES
+# ============================================
+
+**/*.tmp
+**/*.temp
+**/*.bak
+**/*.swp
+**/*.swo
+**/*~
+
+# ============================================
+# BASE DE DONNÉES
+# ============================================
+
+# Backups SQL Server
+**/*.bak
+**/*.ldf
+**/*.mdf
+
+# H2 Database
+**/*.db
+**/h2/
+
+# ============================================
+# UPLOADS / FICHIERS
+# ============================================
+
+**/uploads/
+**/justificatifs/
+**/temp/
+
+# Mais gardez les dossiers vides avec .gitkeep
+!**/.gitkeep
+
+# ============================================
+# TESTS
+# ============================================
+
+**/test-results/
+**/coverage/
+**/.nyc_output/
+
+# ============================================
+# DOCUMENTATION
+# ============================================
+
+# Gardez la doc mais ignorez les builds
+**/docs/build/
+**/*.pdf.backup
+
+# ============================================
+# DIVERS
+# ============================================
+
+# Package files
+**/*.jar
+**/*.war
+**/*.ear
+**/*.zip
+**/*.tar.gz
+**/*.rar
+
+# Except wrapper jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# Compiled class files
+**/*.class
+
+# JVM Crash logs
+**/hs_err_pid*
+
+# ============================================
+# Exceptions - Fichiers à TOUJOURS commit
+# ============================================
+
+# Toujours commit les README
+!**/README.md
+
+# Toujours commit les exemples de config
+!**/application-example.yml
+!**/.env.example
+
+# Toujours commit les scripts SQL de base
+!**/schema.sql
+!**/data-example.sql
