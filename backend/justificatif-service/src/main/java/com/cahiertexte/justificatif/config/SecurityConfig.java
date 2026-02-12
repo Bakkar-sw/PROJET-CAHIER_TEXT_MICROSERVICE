@@ -6,8 +6,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -16,11 +14,13 @@ import java.util.Arrays;
 
 /**
  * Configuration de la sécurité Spring Security
- *
+ * 
  * - Désactive CSRF (car on utilise JWT)
  * - Configure CORS
  * - Désactive les sessions (stateless)
- * - Autorise tous les endpoints (l'auth sera gérée par l'API Gateway)
+ * - Autorise tous les endpoints (l'auth est gérée par l'API Gateway)
+ * 
+ * @author Boubacar Souare
  */
 @Configuration
 @EnableWebSecurity
@@ -31,16 +31,17 @@ public class SecurityConfig {
         http
             // Désactiver CSRF (on utilise JWT)
             .csrf(csrf -> csrf.disable())
-
+            
             // Configuration CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-            // Politique de session : STATELESS
-            .sessionManagement(session ->
+            
+            // Politique de session : STATELESS (pas de sessions)
+            .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
+            
             // Autoriser tous les endpoints
+            // L'authentification sera gérée par l'API Gateway
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()
             );
@@ -64,13 +65,5 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    /**
-     * Password Encoder (BCrypt)
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

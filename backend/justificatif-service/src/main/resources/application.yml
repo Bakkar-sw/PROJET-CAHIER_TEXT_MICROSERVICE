@@ -1,73 +1,59 @@
 server:
-  port: 8081
+  port: 8085
   servlet:
-    context-path: /api/auth 
+    context-path: /api/justificatifs
 
 spring:
   application:
-    name: justificatif-service
+    name: auth-service
 
-  # ===============================
-  # DATABASE SQL SERVER
-  # ===============================
+  # Configuration Base de données SQL Server
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=cahier_texte_db_micro;encrypt=false;trustServerCertificate=true
-    username: sa
-    password: 1234
+    url: jdbc:sqlserver://localhost:1433;databaseName=cahier_texte_db_micro;encrypt=true;trustServerCertificate=true
+    username: administrateur
+    password: MotDePasse123!
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
-  # ===============================
-  # JPA / HIBERNATE
-  # ===============================
+    
+  # Configuration JPA/Hibernate
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update # Utiliser 'validate' en production
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.SQLServerDialect
         format_sql: true
-
-  # ===============================
-  # JACKSON (JSON)
-  # ===============================
+        
+  # Configuration Jackson (JSON)
   jackson:
     serialization:
       write-dates-as-timestamps: false
     time-zone: Africa/Dakar
 
-# ===============================
-# JWT
-# ===============================
+# Configuration JWT
 jwt:
   secret: votre-cle-secrete-ultra-secure-minimum-256-bits-pour-HS256-algorithm-changez-moi-en-production
-  expiration: 86400000
+  expiration: 86400000 # 24 heures en millisecondes
 
-# ===============================
-# LOGGING
-# ===============================
+# Configuration Logging
 logging:
   level:
     root: INFO
-    com.cahiertexte.justificatif: DEBUG
+    com.cahiertexte.auth: DEBUG
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
 
-# ===============================
-# SWAGGER / OPENAPI
-# ===============================
+# Swagger / OpenAPI
 springdoc:
   api-docs:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
-
-# ===============================
-# FEIGN
-# ===============================
+    
+# Configuration Feign (pour appeler d'autres services)
 feign:
   client:
     config:
@@ -75,9 +61,7 @@ feign:
         connectTimeout: 5000
         readTimeout: 5000
 
-# ===============================
-# CORS
-# ===============================
+# Configuration CORS
 cors:
   allowed-origins: http://localhost:4200
   allowed-methods: GET,POST,PUT,DELETE,OPTIONS
