@@ -1,4 +1,5 @@
-package com.cahiertexte.auth.config;
+package com.cahiertexte.justificatif.config;
+
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

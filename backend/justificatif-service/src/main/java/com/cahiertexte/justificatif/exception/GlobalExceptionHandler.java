@@ -1,4 +1,5 @@
-package com.cahiertexte.auth.exception;
+package  com.cahiertexte.justificatif.exception;
+
 
 import com.cahiertexte.common.dto.ApiResponseDTO;
 import com.cahiertexte.common.exception.BadRequestException;

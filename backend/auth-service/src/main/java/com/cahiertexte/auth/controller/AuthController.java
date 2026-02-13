@@ -11,21 +11,14 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Contrôleur REST pour l'authentification
- * 
- * Endpoints disponibles :
- * - POST /login : Connexion
- * - POST /register : Inscription
- * - GET /validate : Valider un token
- * - GET /me : Obtenir les infos de l'utilisateur connecté
- * 
- * @author Boubacar Souare
  */
 @RestController
-@RequestMapping("/") // Le context-path est déjà /api/auth
+@RequestMapping("/")
 @Tag(name = "Authentication", description = "API d'authentification et gestion des tokens JWT")
 @CrossOrigin(origins = "${cors.allowed-origins}")
 public class AuthController {
@@ -34,10 +27,7 @@ public class AuthController {
     private AuthService authService;
 
     /**
-     * Endpoint de connexion
-     * 
-     * @param loginRequest Les identifiants (username, password)
-     * @return Le token JWT et les informations utilisateur
+     * LOGIN
      */
     @PostMapping("/login")
     @Operation(summary = "Connexion", description = "Authentifie un utilisateur et retourne un token JWT")
@@ -47,10 +37,7 @@ public class AuthController {
     }
 
     /**
-     * Endpoint d'inscription (optionnel - peut être désactivé en production)
-     * 
-     * @param userDTO Les informations du nouvel utilisateur
-     * @return L'utilisateur créé
+     * REGISTER
      */
     @PostMapping("/register")
     @Operation(summary = "Inscription", description = "Crée un nouveau compte utilisateur")
@@ -61,60 +48,43 @@ public class AuthController {
     }
 
     /**
-     * Valide un token JWT
-     * 
-     * @param authorization Le header Authorization avec le token
-     * @return true si le token est valide
+     * VALIDATE TOKEN (corrigé)
      */
     @GetMapping("/validate")
     @Operation(summary = "Valider un token", description = "Vérifie si un token JWT est valide")
-    public ResponseEntity<ApiResponseDTO<Boolean>> validateToken(
-            @RequestHeader("Authorization") String authorization) {
-        
-        String token = extractToken(authorization);
-        boolean isValid = authService.validateToken(token);
-        
-        if (isValid) {
-            return ResponseEntity.ok(ApiResponseDTO.success("Token valide", true));
-        } else {
+    public ResponseEntity<ApiResponseDTO<Boolean>> validateToken(Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(ApiResponseDTO.error("Token invalide ou expiré"));
+                    .body(ApiResponseDTO.error("Token invalide ou absent"));
         }
+
+        return ResponseEntity.ok(ApiResponseDTO.success("Token valide", true));
     }
 
     /**
-     * Récupère les informations de l'utilisateur connecté
-     * 
-     * @param authorization Le header Authorization avec le token
-     * @return Les informations utilisateur
+     * GET CURRENT USER (corrigé)
      */
     @GetMapping("/me")
-    @Operation(summary = "Obtenir l'utilisateur connecté", description = "Retourne les informations de l'utilisateur à partir du token")
-    public ResponseEntity<ApiResponseDTO<UserDTO>> getCurrentUser(
-            @RequestHeader("Authorization") String authorization) {
-        
-        String token = extractToken(authorization);
-        UserDTO user = authService.getUserFromToken(token);
-        
+    @Operation(summary = "Utilisateur connecté", description = "Retourne les informations de l'utilisateur connecté")
+    public ResponseEntity<ApiResponseDTO<UserDTO>> getCurrentUser(Authentication authentication) {
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponseDTO.error("Non authentifié"));
+        }
+
+        String username = authentication.getName();
+        UserDTO user = authService.getUserByUsername(username);
+
         return ResponseEntity.ok(ApiResponseDTO.success(user));
     }
 
     /**
-     * Endpoint de test pour vérifier que le service fonctionne
+     * HEALTH CHECK
      */
     @GetMapping("/health")
-    @Operation(summary = "Health check", description = "Vérifie que le service est opérationnel")
     public ResponseEntity<ApiResponseDTO<String>> health() {
         return ResponseEntity.ok(ApiResponseDTO.success("Auth Service is running"));
-    }
-
-    /**
-     * Extrait le token du header Authorization
-     */
-    private String extractToken(String authorization) {
-        if (authorization != null && authorization.startsWith("Bearer ")) {
-            return authorization.substring(7);
-        }
-        throw new IllegalArgumentException("Token manquant ou format invalide");
     }
 }

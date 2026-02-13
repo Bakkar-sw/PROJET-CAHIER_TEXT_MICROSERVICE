@@ -151,4 +151,9 @@ public class AuthService {
 
         return dto;
     }
+
+    public UserDTO getUserByUsername(String username) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getUserByUsername'");
+    }
 }

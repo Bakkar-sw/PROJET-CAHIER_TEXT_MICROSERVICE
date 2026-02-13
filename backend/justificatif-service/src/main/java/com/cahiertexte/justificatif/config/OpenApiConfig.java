@@ -1,4 +1,4 @@
-package com.cahiertexte.auth.config;
+package com.cahiertexte.justificatif.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
