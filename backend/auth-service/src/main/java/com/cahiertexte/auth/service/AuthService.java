@@ -15,9 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service de gestion de l'authentification
- */
 @Service
 @Transactional
 public class AuthService {
@@ -31,29 +28,46 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /**
-     * Authentifie un utilisateur et génère un token JWT
-     */
+    // ================= LOGIN =================
     public AuthResponseDTO login(LoginRequestDTO loginRequest) {
 
-        // Rechercher l'utilisateur
         User user = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new UnauthorizedException(AppConstants.Messages.INVALID_CREDENTIALS));
+                .orElseThrow(() ->
+                        new UnauthorizedException(AppConstants.Messages.INVALID_CREDENTIALS)
+                );
 
-        // Vérifier si le compte est actif
         if (!user.getActif()) {
-            throw new UnauthorizedException("Compte désactivé. Contactez l'administrateur.");
+            throw new UnauthorizedException("Compte désactivé.");
         }
 
-        // Vérification du mot de passe (BCrypt)
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+        // ================= DEBUG PASSWORD =================
+        System.out.println("========== DEBUG LOGIN ==========");
+        System.out.println("Username        = " + loginRequest.getUsername());
+        System.out.println("Password saisi  = " + loginRequest.getPassword());
+        System.out.println("Hash en base    = " + user.getPassword());
+
+        boolean passwordOk = passwordEncoder.matches(
+                loginRequest.getPassword(),
+                user.getPassword()
+        );
+
+        System.out.println("Password MATCH  = " + passwordOk);
+        System.out.println("=================================");
+        // =================================================
+
+        if (!passwordOk) {
+            System.out.println("❌ Mot de passe invalide pour : " + user.getUsername());
             throw new UnauthorizedException(AppConstants.Messages.INVALID_CREDENTIALS);
         }
 
-        // Générer le token JWT
-        String token = jwtUtil.generateToken(user.getUsername(), user.getId(), user.getRole());
+        System.out.println("✅ Authentification OK : " + user.getUsername());
 
-        // Construire la réponse
+        String token = jwtUtil.generateToken(
+                user.getUsername(),
+                user.getId(),
+                user.getRole()
+        );
+
         AuthResponseDTO response = new AuthResponseDTO(
                 token,
                 user.getId(),
@@ -66,47 +80,44 @@ public class AuthService {
         );
 
         response.setExpiresIn(86400000L); // 24h
-
         return response;
     }
 
-    /**
-     * Valide un token JWT
-     */
+    // ================= VALIDATE TOKEN =================
     public boolean validateToken(String token) {
         return jwtUtil.validateToken(token);
     }
 
-    /**
-     * Extrait les informations utilisateur d'un token
-     */
+    // ================= USER FROM TOKEN =================
     public UserDTO getUserFromToken(String token) {
+
         String username = jwtUtil.extractUsername(token);
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException(AppConstants.Messages.USER_NOT_FOUND));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(AppConstants.Messages.USER_NOT_FOUND)
+                );
 
         return convertToDTO(user);
     }
 
-    /**
-     * Inscrit un nouvel utilisateur
-     */
+    // ================= REGISTER =================
     public UserDTO register(UserDTO userDTO) {
 
         if (userRepository.existsByUsername(userDTO.getUsername())) {
-            throw new BadRequestException("Le nom d'utilisateur existe déjà");
+            throw new BadRequestException("Username existe déjà");
         }
 
         if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new BadRequestException("L'email existe déjà");
+            throw new BadRequestException("Email existe déjà");
         }
 
         User user = new User();
+
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
 
-        // Hash du mot de passe avec BCrypt
+        // 🔐 Hash BCrypt
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
 
         user.setPrenom(userDTO.getPrenom());
@@ -120,9 +131,7 @@ public class AuthService {
         return convertToDTO(savedUser);
     }
 
-    /**
-     * Convertit User → UserDTO
-     */
+    // ================= CONVERT =================
     private UserDTO convertToDTO(User user) {
 
         UserDTO dto = new UserDTO(
