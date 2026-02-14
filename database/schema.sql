@@ -4,6 +4,7 @@
 -- ============================================
 
 -- 1. Créer la base de données (si elle n'existe pas)
+<<<<<<< HEAD
 IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'cahier_texte_db')
 BEGIN
     CREATE DATABASE cahier_texte_db;
@@ -11,6 +12,15 @@ END
 GO
 
 USE cahier_texte_db;
+=======
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'cahier_texte_db_micro')
+BEGIN
+    CREATE DATABASE cahier_texte_db_micro;
+END
+GO
+
+USE cahier_texte_db_micro;
+>>>>>>> 80ada71f59300ce8cfe486db3ce4e061bcef5298
 GO
 
 -- ============================================
