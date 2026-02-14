@@ -1,0 +1,72 @@
+server:
+  port: 8086
+  servlet:
+    context-path: /api/stats
+
+spring:
+  application:
+    name: stats-service
+
+  # Pas de base de données pour ce service - il appelle les autres services
+  # On désactive JPA pour éviter les erreurs
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  # Configuration Jackson (JSON)
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Africa/Dakar
+
+# Configuration JWT (pour valider les tokens)
+jwt:
+  secret: votre-cle-secrete-ultra-secure-minimum-256-bits-pour-HS256-algorithm-changez-moi-en-production
+  expiration: 86400000 # 24 heures
+
+# Configuration Logging
+logging:
+  level:
+    root: INFO
+    com.cahiertexte.stats: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Swagger / OpenAPI
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# Configuration Feign (pour appeler les autres services)
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 10000
+        readTimeout: 10000
+        
+      # Configuration spécifique pour chaque service
+      user-service:
+        url: http://localhost:8082
+        
+      cours-service:
+        url: http://localhost:8083
+        
+      presence-service:
+        url: http://localhost:8084
+        
+      justificatif-service:
+        url: http://localhost:8085
+
+# Configuration CORS
+cors:
+  allowed-origins: http://localhost:4200
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+  allowed-headers: "*"
+  exposed-headers: Authorization
+  allow-credentials: true
+  max-age: 3600

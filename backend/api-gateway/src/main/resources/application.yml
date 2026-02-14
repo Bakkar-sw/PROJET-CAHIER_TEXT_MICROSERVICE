@@ -1,0 +1,115 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      # Configuration CORS globale
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "http://localhost:4200"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+
+      # Routes vers les microservices
+      routes:
+        # Auth Service
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - RewritePath=/api/auth/(?<segment>.*), /api/auth/$\{segment}
+
+        # User Service
+        - id: user-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - RewritePath=/api/users/(?<segment>.*), /api/users/$\{segment}
+            - JwtAuthenticationFilter
+
+        # Cours Service
+        - id: cours-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/cours/**
+          filters:
+            - RewritePath=/api/cours/(?<segment>.*), /api/cours/$\{segment}
+            - JwtAuthenticationFilter
+
+        # Matieres (sous-route de cours-service)
+        - id: matieres-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/matieres/**
+          filters:
+            - RewritePath=/api/matieres/(?<segment>.*), /api/cours/matieres/$\{segment}
+            - JwtAuthenticationFilter
+
+        # Presence Service
+        - id: presence-service
+          uri: http://localhost:8084
+          predicates:
+            - Path=/api/presences/**
+          filters:
+            - RewritePath=/api/presences/(?<segment>.*), /api/presences/$\{segment}
+            - JwtAuthenticationFilter
+
+        # Justificatif Service
+        - id: justificatif-service
+          uri: http://localhost:8085
+          predicates:
+            - Path=/api/justificatifs/**
+          filters:
+            - RewritePath=/api/justificatifs/(?<segment>.*), /api/justificatifs/$\{segment}
+            - JwtAuthenticationFilter
+
+        # Stats Service
+        - id: stats-service
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/stats/**
+          filters:
+            - RewritePath=/api/stats/(?<segment>.*), /api/stats/$\{segment}
+            - JwtAuthenticationFilter
+
+# Configuration JWT
+jwt:
+  secret: votre-cle-secrete-ultra-secure-minimum-256-bits-pour-HS256-algorithm-changez-moi-en-production
+
+# Configuration Logging
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Configuration des services
+services:
+  auth:
+    url: http://localhost:8081
+  user:
+    url: http://localhost:8082
+  cours:
+    url: http://localhost:8083
+  presence:
+    url: http://localhost:8084
+  justificatif:
+    url: http://localhost:8085
+  stats:
+    url: http://localhost:8086
